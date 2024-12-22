@@ -1,23 +1,55 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { addUser } from '../../store';
 import UserItem from './UserItem';
 
-class UserList extends React.Component {
+class UserList extends Component {
+    state = { name: '' };
+
+    handleInputChange = (e) => {
+        this.setState({ name: e.target.value });
+    };
+
+    handleAddUser = (e) => {
+        e.preventDefault();
+        const { name } = this.state;
+        if (name.trim()) {
+            this.props.addUser({ name });
+            this.setState({ name: '' });
+        }
+    };
+
     render() {
+        const { users } = this.props;
+
         return (
             <>
-                <form>
+                <form onSubmit={this.handleAddUser}>
                     <div>
-                        <input />
+                        <input
+                            value={this.state.name}
+                            onChange={this.handleInputChange}
+                        />
                         <input type="submit" value="dodaj" />
                     </div>
                 </form>
 
                 <ul>
-                    <UserItem />
+                    {users.map((user) => (
+                        <UserItem key={user.id} id={user.id} name={user.name} />
+                    ))}
                 </ul>
             </>
-        )
+        );
     }
 }
 
-export default UserList;
+const mapStateToProps = (state) => ({
+    users: state.users
+});
+
+const mapDispatchToProps = {
+    addUser
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserList);
